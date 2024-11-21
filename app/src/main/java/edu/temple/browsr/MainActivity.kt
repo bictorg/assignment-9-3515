@@ -93,6 +93,7 @@ class MainActivity : AppCompatActivity(), TabFragment.ControlInterface {
     override fun newPage() {
         browserViewModel.addTab()
         titles.add("New Tab")
+        tabTitles.add("New Tab")
         viewPager.adapter?.notifyItemChanged(browserViewModel.getNumberOfTabs() - 1)
         viewPager.setCurrentItem(browserViewModel.getNumberOfTabs() - 1, true)
         tabTitleAdapter?.notifyDataSetChanged()
