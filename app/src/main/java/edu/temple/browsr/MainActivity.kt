@@ -46,10 +46,15 @@ class MainActivity : AppCompatActivity(), TabFragment.ControlInterface {
                 super.onPageSelected(position)
                 tabLayout?.selectTab(tabLayout?.getTabAt(position))
                 
-                val fragment = supportFragmentManager.findFragmentByTag("f$position")
+                val fragment = supportFragmentManager
+                    .findFragmentByTag("f${viewPager.id}_$position")
                 if (fragment is TabFragment) {
                     fragment.getPageTitle().observe(this@MainActivity) { title ->
-                        tabTitles[position] = title
+                        if (position < tabTitles.size) {
+                            tabTitles[position] = title ?: "New Tab"
+                        } else {
+                            tabTitles.add(title ?: "New Tab")
+                        }
                         updateTitles()
                     }
                 }
@@ -69,7 +74,7 @@ class MainActivity : AppCompatActivity(), TabFragment.ControlInterface {
         tabLayout = findViewById(R.id.tabLayout)
         tabLayout?.let { tabs ->
             TabLayoutMediator(tabs, viewPager) { tab, position ->
-                tab.text = titles.getOrNull(position) ?: "New Tab"
+                tab.text = tabTitles.getOrNull(position) ?: "New Tab"
             }.attach()
         }
     }
@@ -78,7 +83,7 @@ class MainActivity : AppCompatActivity(), TabFragment.ControlInterface {
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView?.let { rv ->
             rv.layoutManager = LinearLayoutManager(this)
-            tabTitleAdapter = TabTitleAdapter(titles) { position ->
+            tabTitleAdapter = TabTitleAdapter(tabTitles) { position ->
                 viewPager.currentItem = position
             }
             rv.adapter = tabTitleAdapter
@@ -92,7 +97,6 @@ class MainActivity : AppCompatActivity(), TabFragment.ControlInterface {
 
     override fun newPage() {
         browserViewModel.addTab()
-        titles.add("New Tab")
         tabTitles.add("New Tab")
         viewPager.adapter?.notifyItemChanged(browserViewModel.getNumberOfTabs() - 1)
         viewPager.setCurrentItem(browserViewModel.getNumberOfTabs() - 1, true)
