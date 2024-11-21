@@ -49,6 +49,11 @@ class PageFragment : Fragment() {
                         pageDataViewModel.setCurrentUrl(this)
                     }
 
+                    // Add this to update the title
+                    view?.title?.let { title ->
+                        pageDataViewModel.setCurrentTitle(title)
+                    }
+
                 }
             }
 
